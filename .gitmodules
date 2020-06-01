@@ -1,0 +1,3 @@
+[submodule "libs/cpp-canonical-wav-decoder"]
+	path = libs/cpp-canonical-wav-decoder
+	url = https://github.com/soundhive/cpp-canonical-wav-decoder.git
