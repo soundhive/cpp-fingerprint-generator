@@ -1,0 +1,1 @@
+valgrind --leak-check=yes --track-origins=yes ./build/CPP_fingerprint_generator ./TEMP/test.wav

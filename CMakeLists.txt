@@ -26,4 +26,10 @@ set(INCLUDES
     ${DEPENDENCIES_HEADERS}
 )
 
+SET(LIBRARIES
+    dejavu_cpp_port
+    cpp_cannonical_wav_decoder
+)
+
+target_link_libraries(${PROJECT_NAME} ${LIBRARIES})
 target_include_directories(${PROJECT_NAME} PUBLIC ${INCLUDES})
