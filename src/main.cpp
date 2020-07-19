@@ -4,7 +4,7 @@
 
 #include <fingerprint.h>
 
-#define MINIMP3_FLOAT_OUTPUT
+//#define MINIMP3_FLOAT_OUTPUT
 #define MINIMP3_IMPLEMENTATION
 #include <minimp3.h>
 #include <minimp3_ex.h>
@@ -17,7 +17,7 @@ namespace fp = fingerprint;
 
 namespace fs = std::experimental::filesystem;
 
-void save_audio_pcm(char *buffer, size_t length, std::string &file_name) {
+void save_audio_wav_pcm(char *buffer, size_t length, std::string &file_name) {
     // Open output file
     std::ofstream out_stream("TEMP/" + file_name, std::ofstream::binary);
 
@@ -37,7 +37,7 @@ void save_audio_pcm(char *buffer, size_t length, std::string &file_name) {
     std::cout << "- Copy done" << std::endl;
 }
 
-void save_audio_pcm(float *buffer, size_t length, std::string &file_name)
+void save_audio_mp3_pcm(mp3d_sample_t *buffer, size_t length, std::string &file_name)
 {
     // Open output file
     std::ofstream out_stream("TEMP/" + file_name, std::ofstream::binary);
@@ -75,7 +75,7 @@ std::shared_ptr<wd::audio_data> run_wav_decoder()
     std::string out_file("wav_file.pcm");
 
 
-    save_audio_pcm(data->audio_buffer.get(), data->buffer_length, out_file);
+    save_audio_wav_pcm(data->audio_buffer.get(), data->buffer_length, out_file);
     
 
     return data;
@@ -119,7 +119,7 @@ mp3dec_file_info_t run_mp3_decoder()
 
     std::string out_file("mp3_file.pcm");
 
-    save_audio_pcm(info.buffer, info.samples * sizeof(mp3d_sample_t), out_file);
+    save_audio_mp3_pcm(info.buffer, info.samples * sizeof(mp3d_sample_t), out_file);
 
     std::cout << "saved mp3 pcm file" << std::endl;
     return info;
