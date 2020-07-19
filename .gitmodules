@@ -4,3 +4,6 @@
 [submodule "libs/dejavu_cpp_port"]
 	path = libs/dejavu_cpp_port
 	url = git@github.com:soundhive/dejavu_cpp_port.git
+[submodule "libs/minimp3"]
+	path = libs/minimp3
+	url = git@github.com:soundhive/minimp3.git
