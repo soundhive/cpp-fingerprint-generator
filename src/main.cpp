@@ -9,7 +9,6 @@
 #include <minimp3.h>
 #include <minimp3_ex.h>
 
-#define OPTIMIZED_BUFFER_SIZE 16 384;
 
 namespace wd = wav_decoder;
 
@@ -72,7 +71,7 @@ std::shared_ptr<wd::audio_data> run_wav_decoder()
     std::cout << "bits per sample : " << data->bits_per_sample << std::endl;
     std::cout << "buffer length : " << data->buffer_length << std::endl;
 
-    std::string out_file("wav_file.pcm");
+    std::string out_file("raw_audio.pcm");
 
 
     save_audio_wav_pcm(data->audio_buffer.get(), data->buffer_length, out_file);
@@ -81,21 +80,6 @@ std::shared_ptr<wd::audio_data> run_wav_decoder()
     return data;
 }
 
-void run_fingerprint_generator(float *buffer, size_t buffer_size, int sample_rate, std::string &out_file)
-{
-
-
-    std::string json = fp::fingerprint(buffer, buffer_size, sample_rate);
-
-
-    std::ofstream json_prints;
-
-    json_prints.open("TEMP/" + out_file, std::ios::out);
-    json_prints << json;
-    json_prints.close();
-
-    std::cout << "printed fingerprints in : " << out_file << std::endl;
-}
 
 mp3dec_file_info_t run_mp3_decoder()
 {
@@ -106,6 +90,7 @@ mp3dec_file_info_t run_mp3_decoder()
     if (mp3dec_load(&mp3d, "TEMP/test.mp3", &info, NULL, NULL))
     {
         std::cout << "an error occured decoding the file.";
+        exit(-1);
     }
     /* mp3dec_file_info_t contains decoded samples and info,
        use free(info.buffer) to deallocate samples */
@@ -117,7 +102,7 @@ mp3dec_file_info_t run_mp3_decoder()
     std::cout << "buffer : " << info.buffer << std::endl;
 
 
-    std::string out_file("mp3_file.pcm");
+    std::string out_file("raw_audio.pcm");
 
     save_audio_mp3_pcm(info.buffer, info.samples * sizeof(mp3d_sample_t), out_file);
 
@@ -128,6 +113,12 @@ mp3dec_file_info_t run_mp3_decoder()
 void fingerprint_from_pcm(std::string &in_file, std::string &out_file, size_t frequency) {
     
     short speech;
+
+    if (!fs::exists("TEMP/" + in_file)) {
+        std::cout << "Could not locate file to fignerprint" << std::endl;
+        exit(-1);
+    }
+
     size_t size = fs::file_size("TEMP/" + in_file);
     float *num_data = new float[size / 2];
 
@@ -145,35 +136,43 @@ void fingerprint_from_pcm(std::string &in_file, std::string &out_file, size_t fr
     delete[] num_data;
     std::ofstream json_prints;
 
-    json_prints.open("TEMP/" + out_file, std::ios::out);
+    json_prints.open(out_file, std::ios::out);
     json_prints << json;
     json_prints.close();
+
+    std::cout << "Fingerprints located in file :" << out_file << std::endl;
 
 
 }
 
 int main(int argc, char const *argv[])
 {
-    
-    mp3dec_file_info_t mp3_infos = run_mp3_decoder();
-    std::string mp3_in_f("mp3_file.pcm");
-    std::string mp3_out_f("mp3_file.txt");
-    fingerprint_from_pcm(mp3_in_f, mp3_out_f, mp3_infos.hz);
 
+     if (!argv[2]) {
 
-    std::shared_ptr<wd::audio_data> wav_infos = run_wav_decoder();
-    std::string wav_in_f("wav_file.pcm");
-    std::string wav_out_f("wav_file.txt");
-    fingerprint_from_pcm(wav_in_f, wav_out_f, wav_infos->sample_rate);
+        std::cerr << "You must specify an input file and then an output file." << std::endl;
 
-    
+    }
+    std::string in_path = argv[1];
+    std::string out_path = argv[2];
 
+    std::string extension(in_path.substr(in_path.length() - 4, in_path.length() - 1));
+    std::cout << extension << std::endl;
 
-    
+    if (extension == ".mp3") {
 
-    //auto data = run_wav_decoder();
+        mp3dec_file_info_t mp3_infos = run_mp3_decoder();
+        std::string mp3_in_f("raw_audio.pcm");
 
-    //run_fingerprint_generator(data);
+        fingerprint_from_pcm(mp3_in_f, out_path, mp3_infos.hz);
+    } 
+    else if (extension == ".wav") {
+
+        std::shared_ptr<wd::audio_data> wav_infos = run_wav_decoder();
+        std::string wav_in_f("raw_audio.pcm");
+
+        fingerprint_from_pcm(wav_in_f, out_path, wav_infos->sample_rate);
+    }
 
     return 0;
 }
