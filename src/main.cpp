@@ -9,14 +9,14 @@
 #include <minimp3.h>
 #include <minimp3_ex.h>
 
-
 namespace wd = wav_decoder;
 
 namespace fp = fingerprint;
 
 namespace fs = std::experimental::filesystem;
 
-void save_audio_wav_pcm(char *buffer, size_t length, std::string &file_name) {
+void save_audio_wav_pcm(char *buffer, size_t length, std::string &file_name)
+{
     // Open output file
     std::ofstream out_stream("TEMP/" + file_name, std::ofstream::binary);
 
@@ -24,7 +24,7 @@ void save_audio_wav_pcm(char *buffer, size_t length, std::string &file_name) {
     if (!out_stream.good())
     {
         std::cout << "Output stream to file "
-                  << "TEMP/" << file_name 
+                  << "TEMP/" << file_name
                   << " is not valid" << std::endl;
         return;
     }
@@ -53,8 +53,6 @@ void save_audio_mp3_pcm(mp3d_sample_t *buffer, size_t length, std::string &file_
     out_stream.write(reinterpret_cast<char *>(buffer), length);
 
     out_stream.close();
-
-
 }
 
 std::shared_ptr<wd::audio_data> run_wav_decoder()
@@ -73,13 +71,10 @@ std::shared_ptr<wd::audio_data> run_wav_decoder()
 
     std::string out_file("raw_audio.pcm");
 
-
     save_audio_wav_pcm(data->audio_buffer.get(), data->buffer_length, out_file);
-    
 
     return data;
 }
-
 
 mp3dec_file_info_t run_mp3_decoder()
 {
@@ -95,12 +90,9 @@ mp3dec_file_info_t run_mp3_decoder()
     /* mp3dec_file_info_t contains decoded samples and info,
        use free(info.buffer) to deallocate samples */
 
-
-
     std::cout << "samples : " << info.samples << std::endl;
     std::cout << "hz : " << info.hz << std::endl;
     std::cout << "buffer : " << info.buffer << std::endl;
-
 
     std::string out_file("raw_audio.pcm");
 
@@ -110,11 +102,13 @@ mp3dec_file_info_t run_mp3_decoder()
     return info;
 }
 
-void fingerprint_from_pcm(std::string &in_file, std::string &out_file, size_t frequency) {
-    
+void fingerprint_from_pcm(std::string &in_file, std::string &out_file, size_t frequency)
+{
+
     short speech;
 
-    if (!fs::exists("TEMP/" + in_file)) {
+    if (!fs::exists("TEMP/" + in_file))
+    {
         std::cout << "Could not locate file to fignerprint" << std::endl;
         exit(-1);
     }
@@ -141,17 +135,15 @@ void fingerprint_from_pcm(std::string &in_file, std::string &out_file, size_t fr
     json_prints.close();
 
     std::cout << "Fingerprints located in file :" << out_file << std::endl;
-
-
 }
 
 int main(int argc, char const *argv[])
 {
 
-     if (!argv[2]) {
+    if (!argv[2])
+    {
 
         std::cerr << "You must specify an input file and then an output file." << std::endl;
-
     }
     std::string in_path = argv[1];
     std::string out_path = argv[2];
@@ -159,14 +151,16 @@ int main(int argc, char const *argv[])
     std::string extension(in_path.substr(in_path.length() - 4, in_path.length() - 1));
     std::cout << extension << std::endl;
 
-    if (extension == ".mp3") {
+    if (extension == ".mp3")
+    {
 
         mp3dec_file_info_t mp3_infos = run_mp3_decoder();
         std::string mp3_in_f("raw_audio.pcm");
 
         fingerprint_from_pcm(mp3_in_f, out_path, mp3_infos.hz);
-    } 
-    else if (extension == ".wav") {
+    }
+    else if (extension == ".wav")
+    {
 
         std::shared_ptr<wd::audio_data> wav_infos = run_wav_decoder();
         std::string wav_in_f("raw_audio.pcm");
