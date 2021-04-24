@@ -2,6 +2,8 @@
 
 #include <iostream>
 #include <fstream>
+#include <globals.hpp>
+#include <stdexcept>
 
 
 std::string save_audio_mp3_pcm(mp3d_sample_t *buffer, size_t length, std::string &file_name);
