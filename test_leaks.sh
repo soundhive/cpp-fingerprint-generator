@@ -1,1 +1,1 @@
-valgrind --leak-check=yes --track-origins=yes ./build/CPP_fingerprint_generator ./TEMP/test.wav
+valgrind --leak-check=yes --track-origins=yes ./build/CPP_fingerprint_generator "/home/vagahbond/Documents/ESGI/Projet_Annuel/cpp_fingerprint_lib/cpp_fingerprint_generator/TEMP/test.mp3" "/home/vagahbond/Documents/ESGI/Projet_Annuel/cpp_fingerprint_lib/cpp_fingerprint_generator/TEMP/mp3_file.txt"
