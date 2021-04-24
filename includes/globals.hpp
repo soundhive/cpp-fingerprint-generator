@@ -2,5 +2,5 @@
 #include <iostream>
 
 
-#define BASE_TEMP_DIR getenv( "BASE_TEMP_DIR" ) ? getenv( "BASE_TEMP_DIR" ) : "TEMP"
+#define BASE_TEMP_DIR (getenv( "BASE_TEMP_DIR" ) ? getenv( "BASE_TEMP_DIR" ) : "TEMP")
 
